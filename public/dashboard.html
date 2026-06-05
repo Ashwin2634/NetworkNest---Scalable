@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetworkNest</title>
+    <link rel="icon" type="image/png" href="img/download.png">
+
+    <link rel="stylesheet" href="style/dashboard_style.css"">
+    <!-- <script src="script/dashboard_script.js" defer></script> -->
+
+</head>
+<body>
+    <!-- first check if we have a live token  -->
+    <script>
+        const token = localStorage.getItem('token');
+        if(!token){
+            console.log('no active session');
+            window.location.href = 'login.html';
+        }
+    </script>
+    
+
+
+    <!-- wraper -->
+    <div class="container">
+
+
+        <!-- left pan -->
+        <div class="contact_pane">
+
+            <!-- section 1 -->
+            <div class="intro_pane">
+                <div class="logo">
+                    <img src="assets/Logo.png" alt="LOGO" >
+                </div>
+                
+                <p id="currentUser" data-userrid="">NetworkNest</p>
+        
+            </div>
+
+            <!-- section 2 -->
+            <div id="contacts">
+                <ul id="contactList">
+
+                </ul>
+
+            </div>
+
+        </div>
+
+
+        <!-- right pan -->
+        <div class="Chat_pane">
+
+            <!-- section 1 -->
+            <div class="user_box">
+                <button id="backBtn">←</button>
+                <p id="userId" data-ruserrid="">NetworkNest</p>
+            </div>
+
+            <!-- section 2 -->
+            <div id="messagebox" >
+                
+            </div>
+
+            <!-- section 3 -->
+            <div class="messageinput_box">
+                
+                <input id="msgInput" placeholder="....message">
+                <button id="sendBtn">Send</button>
+                
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="./script/load_dashboard_protected.js" ></script>
+    <script>
+                
+            
+            document.addEventListener('DOMContentLoaded', () => {
+                LoadDashboard();
+
+                // If contacts load asynchronously, call this after they are added:
+                // setTimeout(attachContactListeners, 500); // or better, call inside your load function
+            });
+    </script>
+
+   
+    
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.8.3/dist/socket.io.min.js"></script>
+    <script>
+
+        const BASE_URL = window.location.origin ;
+        console.log(BASE_URL);
+        const socket = io(BASE_URL, {
+        auth: {
+            token: localStorage.getItem("token")
+        }
+        }); 
+    
+    
+
+        
+
+
+
+        // -----------------------Sending message---------------------------------------------
+
+        
+        const SendMsgbtn = document.getElementById('sendBtn');
+        const currUser = document.getElementById('currentUser');
+        
+        
+        SendMsgbtn.addEventListener('click', (e) => {
+            
+            const msginp = document.getElementById('msgInput');
+            const receiverUser = document.getElementById('userId');
+            
+            if(msginp.value && receiverUser.innerText){
+
+                if(!(currUser.textContent === receiverUser.textContent)) // messaging other contact
+                {
+                    // adding msg to chat
+                    const memsg = document.createElement("li");
+                    memsg.classList.add("my-message");
+                    memsg.textContent = msginp.value;
+                    const msgboxx = document.getElementById('messagebox');
+                    msgboxx.appendChild(memsg);
+                    msgboxx.scrollTop = msgboxx.scrollHeight;        
+                }
+                const sid = currUser.dataset.userrid;
+                const rid = receiverUser.dataset.ruserrid;
+                const emitmsg ={
+                    receiveriid: rid,
+                    context: msginp.value,
+                    senderiid: sid
+                }
+
+                //emitting msg to server
+                socket.emit('privat',emitmsg);
+                
+                msginp.value = "";
+            }
+        });
+
+        
+        //  hering msg from server (friend)
+        socket.on('privat', (msg)=>{
+            const msgboxx = document.getElementById('messagebox');
+            const item = document.createElement("li");
+
+            item.textContent = msg.context;
+            item.classList.add("their-message");
+            msgboxx.appendChild(item);
+            msgboxx.scrollTop = msgboxx.scrollHeight;
+            //adding msg to chatbox
+            // const chats = document.querySelectorAll('.msgBox');
+            // chats.forEach((ell)=>{
+            //     if(ell.dataset.user === msg.fromUser){
+                   
+            //         const ul = document.getElementById(`messages-${msg.fromUser}`);
+        });
+        
+    </script>
+
+
+
+
+
+    </body>
+
+</html>
+
+
+
+<!-- 
+<script src="./script/auth_dashbod.js" defer></script>
+    <script src="script/dashboard_script.js" defer></script>
+    <script>
+               
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+            loaddashboard();
+
+            // If contacts load asynchronously, call this after they are added:
+            // setTimeout(attachContactListeners, 500); // or better, call inside your load function
+        }); -->
+        
+
+
+
+<!-- 
+// </script>
+
+//<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+// <script>
+        
+    //     const BASE_URL = window.location.origin ;
+    //     console.log(BASE_URL);
+    //     const socket = io(BASE_URL, {
+    //     auth: {
+    //         token: localStorage.getItem("token")
+    //     }
+    //     });
+
+        
+
+
+
+    //     // -----------------------Sending message---------------------------------------------
+
+        
+    //     const Sbtn = document.getElementById('sendBtn');
+    //     const currUser = document.getElementById('currentUser');
+        
+        
+    //     Sbtn.addEventListener('click', (e) => {
+            
+    //         const Minp = document.getElementById('msgInput');
+    //         const Unm = document.getElementById('userId');
+
+    //         if(Minp.value && Unm.innerText){
+
+    //             if(!(currUser.textContent === Unm.textContent))
+    //             {
+    //                 // adding msg to chat
+    //                 const ite = document.createElement("li");
+    //                 ite.classList.add("my-message");
+    //                 ite.textContent = Minp.value;
+    //                 const sms = document.querySelectorAll('.msgBox');
+    //                 sms.forEach((e)=>{
+    //                     if(e.dataset.user === Unm.textContent){
+                            
+    //                         const ml = document.getElementById(`messages-${Unm.innerText}`);
+    //                         ml.appendChild(ite);
+                            
+    //                     }
+    //                 })
+    //             }
+    //             //emitting msg to server
+            
+                
+    //             socket.emit('privat',{username: Unm.innerText,message: Minp.value, fromUser: currUser.textContent});
+                
+    //             Minp.value = "";
+    //         }
+    //     });
+
+        
+    //     //  hering msg from server (friend)
+    //     socket.on('privat', (msg)=>{
+       
+    //         const item = document.createElement("li");
+
+    //         item.textContent = msg.message;
+    //         item.classList.add(msg.username === msg.fromUser ? "my-message" : "their-message");
+
+    //         //adding msg to chatbox
+    //         const chats = document.querySelectorAll('.msgBox');
+    //         chats.forEach((ell)=>{
+    //             if(ell.dataset.user === msg.fromUser){
+                   
+    //                 const ul = document.getElementById(`messages-${msg.fromUser}`);
+    //                 ul.appendChild(item);
+                    
+    //                 ell.scrollTop = ell.scrollHeight;
+    //             }
+    //         })
+            
+    //     });
+        
+    // </script>
+
+    -->

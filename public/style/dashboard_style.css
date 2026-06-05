@@ -1,0 +1,240 @@
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    min-height: 100dvh;
+    min-width: 100dvw;
+    color:rebeccapurple;
+    font-family: system-ui, sans-serif;
+    overflow: hidden;
+}
+.container{
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    position: relative;
+}
+
+
+
+/*  left pane --->contacts */
+
+
+.contact_pane{
+    width: 30%;
+    height: 100%;
+    background-color: #9e9ac8;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.intro_pane{
+    width: 100%;
+    height:8%;
+    background-color: #9e9ac8;
+    display: flex;
+}
+
+.contacts{
+    overflow: auto;
+}
+
+.logo{
+    height: 100%;
+    width: 80px;
+    overflow: hidden;
+    opacity: 1;
+    
+}
+.logo img{
+    width: 100%;
+    height: 100%;
+    object-fit:cover;     /* or 'cover' if you want to fill the space */
+    display: block;         /* removes unwanted bottom space */
+}
+
+#currentUser{
+    align-content: center;
+    padding-left: 90px;
+    font-weight: bold;
+}
+#contactList{
+    border: 0;
+    border-bottom: 2px;    
+    border-style: solid;
+    border-color: #54278f;
+    border-radius: 6px;
+    
+}
+.contactCard{
+    width: 100%;
+    height:60px;
+    background-color: #cbc9e2;
+    border:2px;
+    border-color: #54278f;
+    border-style: solid;
+    border-bottom: 0;
+    border-radius: 4px;
+    padding: 10px;
+    align-content: center;
+    text-align: center;
+}
+
+
+
+
+
+/* right pane --->chatbox */
+
+
+.Chat_pane{
+    width: 70%;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.user_box{
+    width: 100%;
+    height:8%;
+    background-color: #cbc9e2;
+    align-content: center;
+    padding-left: 20px;
+    display: flex;
+}
+
+#userId{
+    font-weight: bold;
+
+}
+
+#messagebox{
+    width: 100%;
+    height:82%;
+    overflow: auto;
+    padding-bottom: .5rem;
+    
+}
+
+.messageinput_box{
+    width: 100%;
+    height:10%;
+    background-color:#cbc9e2;
+    padding: 4px;
+    display: flex;
+}
+
+#msgInput{
+    border: 2px solid #756bb1;
+    border-radius: 5px;
+    height: 100%;
+    width: 85%;
+    align-content: center;
+    padding-left: 20px;
+}
+
+#sendBtn{
+    height: 100%;
+    width: 15%;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+        
+
+
+        .my-message{
+            
+            list-style: none;
+            right: 0;
+            background-color: #cbc9e2;
+            border: 2px solid #cbc9e2;
+            border-radius: .7rem;
+
+            width: fit-content;
+            max-width: 80%;
+            overflow: auto;
+
+            margin: .5rem .5rem 0 .5rem;
+            padding: .1rem .7rem .3rem;
+            margin-left: auto;
+        }
+
+        .their-message{
+            
+            list-style: none;
+            background-color: #cbc9e2;
+            border: 2px solid #cbc9e2;
+            border-radius: .7rem;
+
+            width: fit-content;
+            max-width: 80%;
+            overflow: auto;
+
+            margin: .5rem .5rem 0 .5rem;
+            padding: .1rem .7rem .3rem;
+        } 
+
+        .ulll{
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        @media (max-width: 420px) {
+            #contact_pane,
+            #chatbox {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 10;
+            }
+
+            #chatbox {
+                display: none;           /* Hide chat by default on mobile */
+                box-shadow: -2px 0 10px rgba(0,0,0,0.2); /* optional nice effect */
+            }
+
+            #contact_pane {
+                display: block;
+                width: 100%;
+                z-index: 20;
+            }
+
+            /* Hide logo on very small screens if needed */
+            #logo {
+                width: 60px;
+            }
+        }
+
+        /* Optional: Back button styling */
+        #backBtn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            padding: 0 10px;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 420px) {
+            #backBtn {
+                display: block;
+            }
+        }
+
+        @media (min-width: 420px) {
+            #contact_pane {
+                display: block;
+                
+                
+            }
+        }
