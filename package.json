@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "docker compose -f docker-compose.yaml up -d && node server.js redis.js",
+    "start": "node server.js redis.js",
     "dev": "nodemon server.js"
   },
   "author": "",

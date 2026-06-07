@@ -9,3 +9,7 @@ services:
     
 volumes:
   redis-data:
+
+
+
+# i name an ec2 redis container redis-cont
