@@ -1,6 +1,6 @@
 import { createClient } from 'redis';
 
-const redisClient = createClient({ url: 'redis://13.61.32.157:6379'   // default
+const redisClient = createClient({ url: "rediss://default:gQAAAAAAAcl3AAIgcDE0NjQyNDUzNTljYjg0MTU3OGIyODEwNGM0ZDAzOTM5Yw@apparent-beetle-117111.upstash.io:6379"   // default
   // password: 'yourpassword',       // if needed
   // socket: { reconnectStrategy: retries => Math.min(retries * 100, 3000) }
 });
