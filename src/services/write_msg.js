@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import Messages from '../db/models/messages.js';
+import {redisClient} from '../../redis.js'
+
 
 //      const sid = currUser.dataset.userrid;
 //      const rid = receiverUser.dataset.ruserrid;
@@ -12,9 +14,17 @@ import Messages from '../db/models/messages.js';
 
 
 async function fn (data){
-  
+    
     const room = Messages.buildRoomId(data.senderiid, data.receiveriid);
     
+    // writing to redis
+    const key =`messages:room:${room}`;
+    const membr = `${data.senderiid}:${data.context}`;
+    await redisClient.zAdd(key,{score:Date.now(),value:membr});
+    
+    
+    
+    // writing to mongodb
     try{
        
         const sid = new mongoose.Types.ObjectId(data.senderiid);

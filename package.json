@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
+    "start": "node server.js redis.js",
     "dev": "nodemon server.js"
   },
   "author": "",
@@ -15,10 +15,12 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "http": "^0.0.1-security",
+    "ioredis": "^5.11.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.3",
     "nanoid": "^5.1.11",
     "path": "^0.12.7",
+    "redis": "^6.0.0",
     "socket.io": "^4.8.3",
     "url": "^0.11.4"
   }

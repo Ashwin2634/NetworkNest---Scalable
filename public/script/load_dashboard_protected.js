@@ -1,3 +1,14 @@
+const bkbtn = document.getElementById('backBtn');
+bkbtn.addEventListener('click',()=>{
+    const chatpanee = document.getElementById('Chat_pane');    
+    const contactpanee = document.getElementById('contact_pane');    
+    let ismobile = window.innerWidth <=420;
+    if(ismobile){
+        contactpanee.style.display= "block";
+        chatpanee.style.display= "none";
+    }
+});
+
 async function LoadDashboard(){
     // checking token in localstorage
     const token = localStorage.getItem('token');
@@ -66,7 +77,7 @@ function RenderDashboard(data){
         li.classList.add("contactCard");
         li.dataset.ruseriid = name._id;
         
-        
+        //loding chats / and reciver details
         li.addEventListener('click',async (e)=>{
             mboxx.innerHTML='';
             connectedUser.dataset.ruserrid = '';
@@ -79,17 +90,20 @@ function RenderDashboard(data){
 
         
 
-        // Event for mobile size
-// li.addEventListener('click',(e)=>{
-    
-    
-//     let ismobile = window.innerWidth <=420;
-//     if(ismobile){
-//         contPane.style.display= "none";
-//         ctbox.style.display= "block";
-//     }
+        //Event for mobile size
+        li.addEventListener('click',(e)=>{
+            const chatpanee = document.getElementById('Chat_pane');    
+            const contactpanee = document.getElementById('contact_pane');    
+            
+            let ismobile = window.innerWidth <=420;
+            if(ismobile){
+                contactpanee.style.display= "none";
+                chatpanee.style.display= "block";
+                chatpanee.style.width="100%";
+                
+            }
 
-// });
+        });
 
         contactList.appendChild(li);
     });
@@ -104,18 +118,18 @@ async function loadchats(){
     const currenUser = document.getElementById('currentUser');
     const messageBox = document.getElementById('messagebox');
 
-    console.log('------1---------');
+    
 
     const fetChat={
         senderid:currenUser.dataset.userrid.trim(),
         receiverid:connectedUser.dataset.ruserrid.trim()
     }
-    console.log('------2---------');
-    console.log(fetChat);
+    
+   
 
     // fetching chats 
     try{
-        console.log('------3---------');
+        console.log('------0000000--------');
         const chatres = await fetch('/user/loadchat',{
             method:'POST',
             headers:{ 'Authorization': `Bearer ${token}`,
@@ -123,30 +137,33 @@ async function loadchats(){
                     },
             body:JSON.stringify(fetChat)      // always use json.stringify(data) - to convert data into string and state the content type so at the recievers end they will know what type of data they are receving in string and how to convert it - 1) .json() - will give the exact datatype (array / object) 2) .tect()
         });
-        console.log('------4---------');
+        console.log('------1111111111--------');
+        
         if(!chatres.ok){
             console.log(`error loding chats for ${fetChat.receiverid} the err: ${chatres.error}`);
         }
-        console.log('------5---------');
+        console.log('------22222222222222--------');
         messageBox.innerHTML='';
-        console.log('------6---------');
+        
         const chatsdata= await chatres.json();
-        console.log('------677---------');
+        console.log('------44444444444444--------');
         console.log(chatsdata);
         //  chatsdata -  {
         //                   uname: senderid,
         //                   context: msg
         //               }
+        console.log('------555555555555--------');
         chatsdata.forEach((msg)=>{
-            console.log('------7---------');
+            console.log('-------------999999999---------');
+            
             if(msg.senderId._id === currenUser.dataset.userrid){
-                console.log('------8---------');
+                
                 const li = document.createElement('li');
                 li.classList.add('my-message')
                 li.innerText=msg.content;
-                console.log('------9---------');
+                
                 messageBox.appendChild(li);
-                console.log('------10---------');
+                
             }
             else{
                 const li = document.createElement('li');
