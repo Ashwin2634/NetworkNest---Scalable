@@ -249,6 +249,6 @@ io.on("connection", (socket) => {
 
 
 // --------------------------------server listens at port------------------------
-Myserver.listen(port,'0.0.0.0',()=>{
+Myserver.listen(port,()=>{
     console.log('server started ')
 });
