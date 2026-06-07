@@ -1,24 +1,48 @@
 import express from 'express';
 const router = express.Router();
 
+//importing redis client
+import {redisClient} from '../../redis.js';
+
 import User from '../db/models/users.js';
+import messageModel from '../db/models/messages.js';
 
 // All routes here are prefixed with /onbording/dashboard (when mounted)
-router.get('/onbording/dashboard',async (req,res)=>{
-    
-    const result = await User.find({}).select('userName').lean();  //return array of object  // always find returns an array
-    
-    const usernameList = result.map(user => user.userName);
+router.get('/onbording/dashboard', async (req, res) => {
+    try {
+        const result = await User.find({}).select('userName').lean();
 
-    const data = {
-        currUser:req.user.name,          //from jwt paload
-        currUserId:req.user.uId,         //from jwt paload
-        contacts:result
-    } 
+        const key = `user:unreadCounts:${req.user.uId}`;
 
-    res.status(200).json(data);   // 
-})
+        // ✅ Fixed: Use Promise.all() to wait for all async calls
+        const usernameList = await Promise.all(
+            result.map(async (user) => {
+                const roomid = messageModel.buildRoomId(req.user.uId, user._id);
 
+                const uUnread = await redisClient.hGet(key, roomid);
+
+                return {
+                    contactid: user._id,
+                    cuserName: user.userName,
+                    unreadCount: uUnread ? parseInt(uUnread, 10) : 0
+                };
+            })
+        );
+
+        const data = {
+            currUser: req.user.name,
+            currUserId: req.user.uId,
+            contacts: usernameList
+        };
+
+        console.log(data);
+        res.status(200).json(data);
+
+    } catch (error) {
+        console.error("Dashboard route error:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 
 // both works

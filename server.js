@@ -25,7 +25,10 @@ import protect from './src/middlewares/protected.js' ;
 
 //services
 import writeMsg from './src/services/write_msg.js';
+import { time } from 'console';
 
+
+import {redisClient} from './redis.js';
 
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -130,6 +133,48 @@ app.post('/user/loadchat',protect,loadChat_route);
 
 //------------------ Socket.io handling  -------------------------------------
 
+// imp functions
+async function setUserStatus_redis(key, statuss) {
+
+    // Key = `user:status:${socket.user.uId}`;
+
+
+    if (!key) {
+        throw new Error("Redis key is required");
+    }
+
+    // Convert everything to string safely and remove undefined values
+    const data = {
+        status: statuss ?? "offline",           // default if undefined/null
+        lastSeen: Date.now().toString(),        // explicitly convert to string
+    };
+
+    await redisClient.hSet(key, data);
+};
+
+async function getUserStatus_redis(key) {
+    const statuss = await redisClient.hGet(key, 'status');
+    console.log(key,' - ',statuss);
+    return statuss;
+};
+
+async function setUnreadCounts_redis(key, roomid, bool = true) {
+    
+    // key = `user:unreadCounts:${msg.userId}`;
+    
+    if (!key || !roomid) {
+        throw new Error("Key and RoomID are required");
+    }
+
+    if (bool) {
+        // ✅ Increment unread count
+        await redisClient.hIncrBy(key, roomid, 1);
+    } else {
+        // ✅ Reset count to 0
+        await redisClient.hSet(key, roomid, '0');
+    }
+}
+
 io.use((socket,next)=>{
     const token = socket.handshake.auth.token
 
@@ -148,36 +193,45 @@ const onlineUsers = new Map();
 // When a user connects
 io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
-
     onlineUsers.set(socket.user.uId, socket.id);    // later bind it with uId insted name 
-
     console.log(onlineUsers);
-
     
+    const uStatusKey = `user:status:${socket.user.uId}`;
+    setUserStatus_redis(uStatusKey,'online')
     
     // Listen for "privat" from this client
-    socket.on("privat", (msg) => {
-
+    socket.on("privat",async (msg) => {
 
         // const emitmsg ={
         //             receiveriid: rid,
         //             context: msginp.value,
         //             senderiid: sid
         //         }
-
-
-
-
+        console.log('--------hererer--------');
         console.log("Server hearing msg");
         console.log(msg);
-        console.log(onlineUsers.get(msg.senderiid));
 
         //writing it to db
         writeMsg(msg);
 
-        //
-
-        io.to(onlineUsers.get(msg.receiveriid)).emit('privat',msg);
+        //check if receiver online 
+        const rstatkey = `user:status:${msg.receiveriid}`;
+        const isonline = await getUserStatus_redis(rstatkey);
+        console.log(isonline);
+        // if offline
+        if(isonline==='offline'){
+            console.log('------user is offline - update counter------')
+            const roomidd = messagesModel.buildRoomId(msg.senderiid,msg.receiveriid);
+            const userUnreadkey = `user:unreadCounts:${msg.receiveriid}`;
+            setUnreadCounts_redis(userUnreadkey,roomidd,true)
+            console.log('------updated the counter------');
+        }
+        console.log('------000000000------');
+        //sent the message when user online
+        if(isonline==='online'){
+            console.log('------99999 -- user is online------');
+            io.to(onlineUsers.get(msg.receiveriid)).emit('privat',msg);
+        }
 
     });
 
@@ -185,7 +239,8 @@ io.on("connection", (socket) => {
     //handling 'disconnect'
     socket.on("disconnect", () => {
         console.log(`User disconnected: ${socket.id}`);
-        
+        const uStatusKey = `user:status:${socket.user.uId}`;
+        setUserStatus_redis(uStatusKey,'offline');
     });
     
 });

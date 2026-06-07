@@ -62,27 +62,34 @@ const mboxx = document.getElementById('messagebox');
 //              contacts:   usernameList,
 //           } 
 
+//data.contacts = {
+//                    contactid: user._id,
+//                    cuserName: user.userName,
+//                    unreadCount: uUnread ? parseInt(uUnread, 10) : 0
+//                }
+
+
 function RenderDashboard(data){
     contactList.innerHTML = '';
     currenUser.innerText = data.currUser;
     currenUser.dataset.userrid = data.currUserId;
    
     const cons = data.contacts;
-    
+    console.log(cons);
     cons.forEach(name => {
         const li = document.createElement('li');
         
         //contact card
-        li.textContent = name.userName;
+        li.textContent = `${name.cuserName} - ${name.unreadCount}`;     /// user username
         li.classList.add("contactCard");
-        li.dataset.ruseriid = name._id;
+        li.dataset.ruseriid = name.contactid;    /// user id _id
         
         //loding chats / and reciver details
         li.addEventListener('click',async (e)=>{
             mboxx.innerHTML='';
             connectedUser.dataset.ruserrid = '';
             connectedUser.innerHTML='';
-            connectedUser.innerText=name.userName;
+            connectedUser.innerText=name.cuserName;
             connectedUser.dataset.ruserrid = e.currentTarget.dataset.ruseriid;       /// yha pr receiver ki uid aaye gi. kha se - har contacts me dalni pde gi
             loadchats();
 
@@ -148,12 +155,16 @@ async function loadchats(){
         const chatsdata= await chatres.json();
         console.log('------44444444444444--------');
         console.log(chatsdata);
-        //  chatsdata -  {
-        //                   uname: senderid,
-        //                   context: msg
-        //               }
+    //          chatsdata = {   chats: [  {
+    //                                   senderId:{_id : senderId},
+    //                                   content : msg,
+    //                                } ....] ,
+    //                          UnreadCounts: uUnread 
+    //                      }
+
         console.log('------555555555555--------');
-        chatsdata.forEach((msg)=>{
+        const cchats =chatsdata.chats;
+        cchats.forEach((msg)=>{
             console.log('-------------999999999---------');
             
             if(msg.senderId._id === currenUser.dataset.userrid){
